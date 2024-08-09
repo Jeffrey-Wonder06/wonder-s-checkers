@@ -106,12 +106,14 @@ function dragStart(e) {
 function dragEnd(e) {
     const [fromRow, fromCol] = e.dataTransfer.getData('text').split(',').map(Number);
     const toSquare = document.elementFromPoint(e.clientX, e.clientY);
+    if (!toSquare || !toSquare.dataset.row || !toSquare.dataset.col) return;
+
     const toRow = Number(toSquare.dataset.row);
     const toCol = Number(toSquare.dataset.col);
 
     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
         movePiece(fromRow, fromCol, toRow, toCol);
-        if (toRow === 0 && currentPlayer === 'red' || toRow === 7 && currentPlayer === 'black') {
+        if ((toRow === 0 && currentPlayer === 'red') || (toRow === 7 && currentPlayer === 'black')) {
             promoteToKing(toRow, toCol);
         }
         currentPlayer = currentPlayer === 'red' ? 'black' : 'red';
@@ -119,8 +121,7 @@ function dragEnd(e) {
 }
 
 function isValidMove(fromRow, fromCol, toRow, toCol) {
-    // Add your move validation logic here
-    return (Math.abs(fromRow - toRow) === 1 && Math.abs(fromCol - toCol) === 1) && (toSquareEmpty(toRow, toCol));
+    return (Math.abs(fromRow - toRow) === 1 && Math.abs(fromCol - toCol) === 1) && toSquareEmpty(toRow, toCol);
 }
 
 function toSquareEmpty(row, col) {
