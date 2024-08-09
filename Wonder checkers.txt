@@ -7,17 +7,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <h1>Draughts Game</h1>
     <div id="board"></div>
     <script src="script.js"></script>
 </body>
 </html>
 body {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    margin: 20px 0;
 }
 
 #board {
@@ -30,6 +35,7 @@ body {
 .square {
     width: 50px;
     height: 50px;
+    box-sizing: border-box;
 }
 
 .dark {
@@ -44,10 +50,10 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    margin: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .red {
@@ -56,7 +62,6 @@ body {
 
 .black {
     background-color: black;
-    color: white;
 }
 
 .king {
@@ -106,14 +111,12 @@ function dragStart(e) {
 function dragEnd(e) {
     const [fromRow, fromCol] = e.dataTransfer.getData('text').split(',').map(Number);
     const toSquare = document.elementFromPoint(e.clientX, e.clientY);
-    if (!toSquare || !toSquare.dataset.row || !toSquare.dataset.col) return;
-
     const toRow = Number(toSquare.dataset.row);
     const toCol = Number(toSquare.dataset.col);
 
     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
         movePiece(fromRow, fromCol, toRow, toCol);
-        if ((toRow === 0 && currentPlayer === 'red') || (toRow === 7 && currentPlayer === 'black')) {
+        if (toRow === 0 && currentPlayer === 'red' || toRow === 7 && currentPlayer === 'black') {
             promoteToKing(toRow, toCol);
         }
         currentPlayer = currentPlayer === 'red' ? 'black' : 'red';
@@ -121,6 +124,9 @@ function dragEnd(e) {
 }
 
 function isValidMove(fromRow, fromCol, toRow, toCol) {
+    // Basic move validation: diagonal and adjacent squares
+    const fromSquare = squares[fromRow * cols + fromCol];
+    const toSquare = squares[toRow * cols + toCol];
     return (Math.abs(fromRow - toRow) === 1 && Math.abs(fromCol - toCol) === 1) && toSquareEmpty(toRow, toCol);
 }
 
